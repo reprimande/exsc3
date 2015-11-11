@@ -28,7 +28,7 @@ defmodule Exsc3.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     # wip
-    #[{:exosc, git: "https://github.com/naokinomoto/exosc.git"}]
-    [{:exosc, path: "../exosc"}]
+    [{:exosc, git: "https://github.com/naokinomoto/exosc.git"}]
+    #[{:exosc, path: "../exosc"}]
   end
 end

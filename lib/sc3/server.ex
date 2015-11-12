@@ -1,16 +1,24 @@
 defmodule SC3.Server do
   use GenServer
 
+  def send_msg(msg, args) do
+    GenServer.cast(:sc3_server, {:send_msg, msg, args})
+  end
+
   def s_new(name, node_id) do
-    GenServer.cast(:sc3_server, {:s_new, name, node_id})
+    send_msg("s_new", [name, node_id, 1, 1])
   end
 
   def n_set(node_id, args) do
-    GenServer.cast(:sc3_server, {:n_set, node_id, args})
+    send_msg("n_set", [node_id, args |> List.flatten])
   end
 
   def n_free(node_id) do
-    GenServer.cast(:sc3_server, {:n_free, node_id})
+    send_msg("n_free", [node_id])
+  end
+
+  def stop do
+    GenServer.cast(:sc3_server, {:stop})
   end
 
   def start_link(host \\ '0.0.0.0', port \\ 57110) do
@@ -22,18 +30,8 @@ defmodule SC3.Server do
     {:ok, {host, port}}
   end
 
-  def handle_cast({:s_new, name, node_id}, {host, port}) do
-    OSC.Client.send(host, port, "s_new", [name, node_id])
-    {:noreply, {host, port}}
-  end
-
-  def handle_cast({:n_set, node_id, args}, {host, port}) do
-    OSC.Client.send(host, port, "n_set", [node_id, args] |> List.flatten)
-    {:noreply, {host, port}}
-  end
-
-  def handle_cast({:n_free, node_id}, {host, port}) do
-    OSC.Client.send(host, port, "n_free", [node_id])
+  def handle_cast({:send_msg, msg, args}, {host, port}) do
+    OSC.Client.send(host, port, msg, args)
     {:noreply, {host, port}}
   end
 end

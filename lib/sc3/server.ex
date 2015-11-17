@@ -5,6 +5,10 @@ defmodule SC3.Server do
     GenServer.cast(:sc3_server, {:send_msg, msg, args})
   end
 
+  def get_node_id do
+    GenServer.call(:sc3_server, :get_node_id)
+  end
+
   def s_new(name, node_id) do
     send_msg("s_new", [name, node_id, 1, 1])
   end
@@ -27,11 +31,15 @@ defmodule SC3.Server do
 
   def init([host, port]) do
     OSC.Client.start_link
-    {:ok, {host, port}}
+    {:ok, {host, port, 1000}}
   end
 
-  def handle_cast({:send_msg, msg, args}, {host, port}) do
+  def handle_cast({:send_msg, msg, args}, {host, port, next_node_id}) do
     OSC.Client.send(host, port, msg, args)
-    {:noreply, {host, port}}
+    {:noreply, {host, port, next_node_id}}
+  end
+
+  def handle_call(:get_node_id, _from, {host, port, next_node_id}) do
+    {:reply, next_node_id, {host, port, next_node_id + 1}}
   end
 end

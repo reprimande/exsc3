@@ -39,14 +39,14 @@ defmodule SC3.Server do
     {:noreply, {host, port, next_node_id}}
   end
 
-  def handle_call(:get_node_id, _from, {host, port, next_node_id}) do
-    {:reply, next_node_id, {host, port, next_node_id + 1}}
-  end
-
-  def handle_cast({:stop}, {host, port, next_node_id}) do
+  def handle_cast({:stop}, {host, port, _}) do
     OSC.Client.send(host, port, "/g_freeAll", [0])
     OSC.Client.send(host, port, "/clearSched", [])
     OSC.Client.send(host, port, "/g_new", [1, 0, 0])
     {:noreply, {host, port, 1000}}
+  end
+
+  def handle_call(:get_node_id, _from, {host, port, next_node_id}) do
+    {:reply, next_node_id, {host, port, next_node_id + 1}}
   end
 end

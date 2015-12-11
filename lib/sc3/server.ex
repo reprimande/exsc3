@@ -25,13 +25,13 @@ defmodule SC3.Server do
     GenServer.cast(:sc3_server, {:stop})
   end
 
-  def start_link(host \\ '0.0.0.0', port \\ 57110) do
-    GenServer.start_link(__MODULE__, [host, port], name: :sc3_server)
+  def start_link(host \\ '0.0.0.0', port \\ 57110, start_node_id \\ 5000) do
+    GenServer.start_link(__MODULE__, [host, port, start_node_id], name: :sc3_server)
   end
 
-  def init([host, port]) do
+  def init([host, port, start_node_id]) do
     OSC.Client.start_link
-    {:ok, {host, port, 1000}}
+    {:ok, {host, port, start_node_id}}
   end
 
   def handle_cast({:send_msg, msg, args}, {host, port, next_node_id}) do
